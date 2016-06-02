@@ -49,6 +49,7 @@ import Data.List (isSuffixOf)
 import Data.Complex (Complex)
 import Data.Int (Int32)
 import Data.Word (Word8)
+import Instances.TH.Lift ()
 import System.IO.Unsafe (unsafePerformIO)
 
 -------------------------------------------------------------------------------
@@ -136,9 +137,6 @@ instance TH.Lift (IO [SEXP s a]) where
         go [returnIO -> xio]        = [| xio >>= return . (:[]) |]
         go ((returnIO -> xio) : xs) =
           [| R.withProtected xio $ $(go xs) . fmap . (:) |]
-
-instance TH.Lift BS.ByteString where
-    lift bs = let s = BS.unpack bs in [| BS.pack s |]
 
 #if ! MIN_VERSION_th_orphans(0,11,0)
 instance TH.Lift Int32 where
